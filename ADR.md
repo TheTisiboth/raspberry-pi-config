@@ -6,6 +6,10 @@ Decisions that span several repos of the Pi stack (`~/projects/pi`). Stack overv
 Add a new ADR at the bottom with the next number. Don't rewrite an accepted one: mark it
 **Superseded by ADR-XXX** and add a new one.
 
+> **Keep both copies in sync.** This file exists in two places: `~/projects/pi/ADR.md`
+> (pi root folder, not a repo) and `raspberry-pi-config/ADR.md` (versioned copy). Whenever
+> one is updated, copy it to the other and commit the `raspberry-pi-config` one.
+
 ---
 
 ## ADR-001: homepage dashboard uses a curated service list
