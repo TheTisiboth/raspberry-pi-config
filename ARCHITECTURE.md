@@ -36,21 +36,12 @@ Overview of everything deployed on the Raspberry Pi 5 (`leopi`, LAN
 
 - Every repo pins its external port through `APP_PORT` (see each `.env.example`).
 - Secrets live only in each service's `.env` on the Pi — never committed.
+- A new service repo must be registered in `homepage/config/services.yaml` and in the
+  table above (ADR-002).
 
-## ADR: homepage dashboard uses a curated service list
+## Decisions
 
-**Decision:** the homepage dashboard lists services **statically** in
-`homepage/config/services.yaml`. gethomepage Docker auto-discovery is **intentionally
-disabled** — there is no `homepage/config/docker.yaml`, and the app repos carry **no
-`homepage.*` labels**.
+Architecture decision records live in [`ADR.md`](ADR.md):
 
-**Why:** central control over naming, grouping, icons and ordering, and no clutter from
-internal containers (Postgres, Ollama, init jobs). Adding a service is a one-file edit
-in the homepage repo.
-
-**Consequence:** when a Pi service is added or renamed, update
-`homepage/config/services.yaml` by hand (groups/columns live in
-`config/settings.yaml`). Do **not** add `homepage.*` labels to the app repos — they are
-ignored while discovery is off. To switch to auto-discovery later, create
-`config/docker.yaml` with a `socket: /var/run/docker.sock` instance and label each
-container.
+- ADR-001: homepage dashboard uses a curated service list
+- ADR-002: every new Pi service must be registered in homepage
