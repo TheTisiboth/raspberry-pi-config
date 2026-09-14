@@ -19,9 +19,10 @@ Overview of everything deployed on the Raspberry Pi 5 (`leopi`, LAN
 
 ## Deployment
 
-- **Dokploy** orchestrates every service from its repo's `docker-compose.yml`.
-  Compose projects join the external `dokploy-network`; each
-  `docker-compose.prod.yml` override exists only to attach that network.
+- **Dokploy** builds and runs every service on the Pi from its repo's `docker-compose.yml`
+  (+ `docker-compose.prod.yml`). Only public services join the external `dokploy-network`;
+  databases, Redis and model servers stay on each project's private network. Dockerfile,
+  compose and image-pinning conventions: [`DOCKER.md`](DOCKER.md).
 - **Traefik** (inside Dokploy) terminates TLS and routes `*.leojan.fr` subdomains to
   containers. `APP_PORT` in each `.env` sets the external port; containers keep a
   fixed internal port.
@@ -38,6 +39,7 @@ Overview of everything deployed on the Raspberry Pi 5 (`leopi`, LAN
 - Secrets live only in each service's `.env` on the Pi — never committed.
 - A new service repo must be registered in `homepage/config/services.yaml` and in the
   table above (ADR-002).
+- Docker setup follows [`DOCKER.md`](DOCKER.md) (ADR-003).
 
 ## Decisions
 
@@ -45,3 +47,4 @@ Architecture decision records live in [`ADR.md`](ADR.md):
 
 - ADR-001: homepage dashboard uses a curated service list
 - ADR-002: every new Pi service must be registered in homepage
+- ADR-003: shared Docker conventions, optimized for cold builds on the Pi

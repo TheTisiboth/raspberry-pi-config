@@ -61,3 +61,38 @@ gets forgotten, and its health dot is the quickest way to spot it being down.
 
 **Consequence:** one extra commit in `homepage` per new service. Internal-only
 containers (databases, model servers, one-shot jobs) are not services and are not listed.
+
+---
+
+## ADR-003: shared Docker conventions, optimized for cold builds on the Pi
+
+**Status:** Accepted
+
+**Context:** each repo grew its own Dockerfile and compose setup. Dokploy builds every image
+on the Pi, and its daily cleanup (`image prune --all`, `builder prune --all`) makes the first
+deploy of each day a fully cold build. Measured issues: dependencies installed twice, compiler
+toolchains installed for unused native modules, `chown -R` layers duplicating `node_modules`,
+dev dependencies shipped at runtime, `latest` image tags, and prod overrides putting databases
+on the shared `dokploy-network`, where AdventCalendar's `postgres` resolved to two containers
+(its own and WebCV_backend's).
+
+**Decision:** all repos follow [`DOCKER.md`](DOCKER.md):
+
+1. Node images: multi-stage `base → deps → build / prod-deps → runner`, one install,
+   `npm prune --omit=dev` (or `pnpm prune --prod`), toolchain only when a native module needs
+   it, non-root `node` user with `COPY --chown`, `ARG NODE_VERSION` (Node 22 LTS).
+2. Compose: no `version:`, compose-owned healthchecks, only `APP_PORT` published (dev-only
+   ports on `127.0.0.1`), unique `container_name` for services reached cross-project.
+3. Networks: base compose has no network config; `docker-compose.prod.yml` attaches **only
+   public services** to `dokploy-network` (plus `default`). Databases never join it.
+4. Images pinned to exact version tags; a version comes from an env variable (with a pinned
+   default) only when several services share it or it is upgraded as an operation.
+5. Build changes are measured with `scripts/docker-bench.sh` (cold/warm time, CPU, network,
+   image size) and the numbers go in the PR.
+
+**Why:** cold builds are the common case on the Pi, so installs and downloads dominate. One
+pattern across repos makes a fix in one repo easy to apply everywhere, and keeping databases
+off the shared network removes cross-project name collisions by construction.
+
+**Consequence:** a new repo copies the templates from `DOCKER.md`. Upgrading a pinned image is
+a one-line commit instead of happening silently on redeploy.
