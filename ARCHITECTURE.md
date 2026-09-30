@@ -15,6 +15,7 @@ Overview of everything deployed on the Raspberry Pi 5 (`leopi`, LAN
 | `WebCV_backend` | Strapi CMS | https://admin.leojan.fr | CV content backend for WebCV |
 | `AdventCalendar` | Advent Calendar (Next.js) | https://calendar.leojan.fr | + Postgres |
 | `dot` | Frisbee Bot | _(no web UI)_ | Telegram bot, `/health` only; + Ollama |
+| `isponsorblocktv` | iSponsorBlockTV | _(no web UI)_ | Skips YouTube sponsors/ads on the Google TV via the Lounge API |
 | `raspberry-pi-config` | Host config (this repo) | — | DuckDNS, DNS split-horizon, NetworkManager |
 
 ## Deployment
