@@ -1,0 +1,8 @@
+[Unit]
+Description=Restart containers that failed to rejoin a Docker overlay network
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/overlay-ip-repair.sh
