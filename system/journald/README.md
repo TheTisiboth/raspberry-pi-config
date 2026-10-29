@@ -13,6 +13,7 @@ an unclean restart there is nothing left to say why it happened. Between
 ```sh
 sudo install -D -m 644 50-persistent.conf /etc/systemd/journald.conf.d/50-persistent.conf
 sudo systemctl restart systemd-journald
+sudo journalctl --flush   # move the running journal from /run to disk now
 ```
 
 ## After a crash
