@@ -1,0 +1,11 @@
+[Unit]
+Description=Periodically repair containers stuck off their Docker overlay network
+
+[Timer]
+# First run once Swarm has settled after boot, then keep checking, since a
+# collision can also happen whenever a container is restarted later on.
+OnBootSec=90s
+OnUnitActiveSec=2min
+
+[Install]
+WantedBy=timers.target
