@@ -1,11 +1,12 @@
 # Docker boot recovery
 
-Two fixes for Dokploy containers that stay broken after the Pi reboots. Both
-showed up on 2026-10-14, when a reboot took every public site down.
+Fixes for Dokploy containers that stay broken after the Pi reboots. The
+first two showed up on 2026-10-14, when a reboot took every public site down.
 
 | Problem | Symptom | Fix |
 |---------|---------|-----|
 | A container's old overlay IP on `dokploy-network` is taken by another container | Container stays `Exited (255)`, error `attaching to network failed ... context deadline exceeded`. Docker never retries it, even with `restart: always`. If it's `dokploy-traefik`, every site is down. | `overlay-ip-repair.timer`: 90s after boot, then every 2 min, reconnects such containers without a pinned IP and starts them. |
+| Docker starts a container before Swarm has set up `dokploy-network` on the node | Container stays `Exited (255)`, error `failed to set up container networking: network <id> not found`, although `docker network ls` shows that ID. Same no-retry behaviour. Seen on `dokploy-traefik` on 2026-11-02. | Same timer: it matches this error too. |
 | Docker starts before NetworkManager has written DNS (eth0 link flap at boot) | Containers run but can't resolve internet names (`EAI_AGAIN`, `ENETUNREACH`). Dokploy deploys fail with `getaddrinfo EAI_AGAIN api.github.com`. dockerd logs `DNS resolver has no external nameservers`. | `wait-for-dns.sh` as an `ExecStartPre` of `docker.service`. It waits up to 120s for a non-loopback nameserver. |
 
 ## Install / update
